@@ -37,14 +37,60 @@ def user_activity(user):
     
     return numbertable
 
-users = [248158876799729664,140424290171486208,125449182663278592,246334877287317504,482863919111733248]
+def money():
+    numbertable = []
+    directory = []
+    for folder1 in os.listdir():
+        if folder1 not in ['last_reset','stats.py','users']:
+            year = int(folder1.split('_')[0])
+            month = int(folder1.split('_')[1])
+            directory.append(year*100+month)
 
-for user in users:
-    numbertable = user_activity(user)
+    directory.sort()
+    for code in directory:
+        folder1 = '{}_{}'.format(code//100,code%100)
+        for folder2 in os.listdir(folder1):
+            for backup in os.listdir(folder1 + '/' + folder2):
+                if 'backup_general' in backup:
+
+                    print(folder1+'/'+folder2+'/'+backup)
+                    conn = sqlite3.connect(folder1 + '/' + folder2 + '/' + backup)
+                    c = conn.cursor()
+
+                    try:
+                        c.execute('SELECT SUM(credits) FROM \'users\'')
+                    except Exception:
+                        print("Table not found in file {}.".format(folder1 + '/' + folder2 + '/' + backup))
+                    else:
+                        answer = c.fetchone()
+
+                        if answer == None:
+                            numbertable.append(0)
+                        else:
+                            numbertable.append(answer[0])
+                    
+                    conn.close()
+    
+    return numbertable
+
+# Activity
+if __name__ == "__tmain__":
+    users = [248158876799729664,140424290171486208,125449182663278592,246334877287317504,482863919111733248]
+
+    for user in users:
+        numbertable = user_activity(user)
+        plt.plot(range(len(numbertable)),numbertable)
+
+    if len(users) == 1:
+        plt.savefig('users/' + str(user))
+
+    plt.savefig('users/temp')
+    plt.show()
+
+# Money
+if __name__ == "__main__":
+    numbertable = money()
     plt.plot(range(len(numbertable)),numbertable)
 
-if len(users) == 1:
-    plt.savefig('users/' + str(user))
-
-plt.savefig('users/temp')
-plt.show()
+    plt.savefig('users/money')
+    plt.show()

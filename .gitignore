@@ -59,5 +59,6 @@ docs/_build/
 config\.py
 stats\.json
 
-backup/
+backup/2018_10/
+backup/2018_9/
 storage/loot\.txt
